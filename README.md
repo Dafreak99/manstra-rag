@@ -27,11 +27,11 @@ Mastra handles memory automatically through:
 
 ### Storage
 
-Uses LibSQL (SQLite) for storage, which can be configured as:
+Uses PostgreSQL with pgvector for storage and semantic search:
 
-- In-memory (`:memory:`) - for testing, data lost on restart
-- File-based (`file:./data/mastra.db`) - for local persistence
-- Remote LibSQL/Turso database - for production deployments
+- **PostgresStore**: For message and memory persistence
+- **PgVector**: For semantic recall and similarity search
+- Requires PostgreSQL database with pgvector extension enabled
 
 ## Setup
 
@@ -55,30 +55,46 @@ pnpm install
 cp .env.example .env
 ```
 
-2. Update `.env` with your API keys:
+2. **Option A: Use Docker Compose (Recommended)**
+
+   Start PostgreSQL with pgvector pre-installed using Docker Compose:
+
+   ```bash
+   docker-compose up -d
+   ```
+
+   This will start a PostgreSQL 16 container with pgvector extension already enabled on port `5434`. The default credentials are:
+
+   - **User**: `postgres`
+   - **Password**: `yourpassword` (or set `POSTGRES_PASSWORD` in `.env`)
+   - **Database**: `manstra_ai` (or set `POSTGRES_DB` in `.env`)
+   - **Port**: `5434` (mapped from container's 5432)
+
+   **Option B: Use your own PostgreSQL**
+
+   If you prefer to use your own PostgreSQL instance, make sure the `pgvector` extension is enabled:
+
+   ```sql
+   CREATE EXTENSION IF NOT EXISTS vector;
+   ```
+
+3. Update `.env` with your configuration:
 
 ```env
-# Primary: Anthropic (if available, will be used)
-# Uses Claude models (e.g., claude-3-5-sonnet-20241022)
-ANTHROPIC_API_KEY=your_key_here
+PORT=3001
+NODE_ENV=development
+DATABASE_URL=postgresql://postgres:yourpassword@localhost:5434/manstra_ai
 
-# Fallback: OpenRouter (used if no Anthropic key)
-# Models automatically get 'openrouter/' prefix
-# Default models: openrouter/x-ai/grok-4.1-fast (premium), openrouter/openai/gpt-oss-20b (default)
-OPENROUTER_API_KEY=your_key_here
-```
+# Anthropic API Key
+ANTHROPIC_API_KEY=your_anthropic_api_key_here
 
-3. Configure database storage (optional):
+# OpenRouter API Key (alternative to Anthropic)
+OPENROUTER_API_KEY=your_openrouter_api_key_here
 
-```env
-# In-memory (default, for testing)
-DATABASE_URL=:memory:
+PREMIUM_MODEL=x-ai/grok-4-fast
+DEFAULT_MODEL=openai/gpt-oss-20b
 
-# File-based (for local persistence)
-DATABASE_URL=file:./data/mastra.db
-
-# Remote LibSQL/Turso
-DATABASE_URL=libsql://your-database-url
+TELEGRAM_BOT_TOKEN=your_telegram_bot_token_here
 ```
 
 ### Running
@@ -154,16 +170,6 @@ When you send a message with `userId` and `chatId`:
 4. **Storage**: All messages and memories are persisted to the configured storage backend
 
 No manual memory extraction or embedding generation is needed - Mastra handles it all!
-
-## Comparison with Parent Project
-
-| Feature           | Parent Project             | Mastra Project   |
-| ----------------- | -------------------------- | ---------------- |
-| Memory Storage    | Manual Postgres + pgvector | Automatic LibSQL |
-| Memory Extraction | Manual worker process      | Built-in         |
-| Embeddings        | Manual generation          | Automatic        |
-| Context Building  | Manual service             | Built-in         |
-| Setup Complexity  | High                       | Low              |
 
 ## Project Structure
 
