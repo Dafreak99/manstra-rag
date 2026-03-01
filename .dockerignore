@@ -1,0 +1,17 @@
+node_modules
+dist
+.git
+.gitignore
+.env
+.env.local
+.env.*.local
+*.log
+.DS_Store
+data
+*.db
+*.db-journal
+README.md
+SETUP.md
+.vscode
+.idea
+

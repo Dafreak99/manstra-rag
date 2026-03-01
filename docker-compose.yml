@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  # PostgreSQL with pgvector extension
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: manstra-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-yourpassword}
+      POSTGRES_DB: ${POSTGRES_DB:-manstra_ai}
+    ports:
+      - '5434:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
