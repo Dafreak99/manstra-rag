@@ -200,8 +200,6 @@ The project includes full Telegram bot integration. To set it up:
 
 The Telegram bot uses Mastra's memory system, so it automatically remembers context across conversations. Each Telegram user gets their own memory thread, and the bot maintains context seamlessly.
 
-See [SETUP.md](./SETUP.md) for detailed setup instructions.
-
 ## Learn More
 
 - [Mastra Documentation](https://mastra.ai/docs)
